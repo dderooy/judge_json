@@ -19,3 +19,9 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/judge_json>.
 
+## About
+This project is inspired by:
+- https://github.com/santalvarez/python-rule-engine
+- https://github.com/CacheControl/json-rules-engine
+
+

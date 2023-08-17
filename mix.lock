@@ -1,0 +1,4 @@
+%{
+  "jason": {:hex, :jason, "1.4.1", "af1504e35f629ddcdd6addb3513c3853991f694921b1b9368b0bd32beb9f1b63", [:mix], [{:decimal, "~> 1.0 or ~> 2.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm", "fbb01ecdfd565b56261302f7e1fcc27c4fb8f32d56eab74db621fc154604a7a1"},
+  "odgn_json_pointer": {:hex, :odgn_json_pointer, "3.0.1", "0776babea6dc2e87f4569f24aaf771ea06dc62f1dd217f015bdfca550e6fcc7f", [:mix], [], "hexpm", "776d70ac887531d9235449f88b9c74a94cfa6669032bbf92e51a4c53a25212ad"},
+}
