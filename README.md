@@ -1,4 +1,4 @@
-# Judge Json
+# JudgeJson
 An Elixir rule engine where rules are json objects. The judge gives verdicts on data and returns any matched rules.
 
 
