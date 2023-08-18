@@ -1,30 +1,22 @@
-# judge_json
+# Judge Json
 An Elixir rule engine where rules are json objects. The judge gives verdicts on data and returns any matched rules.
 
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
+[Available in Hex](https://hex.pm/packages/judge_json), the package can be installed
 by adding `judge_json` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:judge_json, "~> 0.1.0"}
+    {:judge_json, ">= 0.1.0"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/judge_json>.
-
-### About
-This project is inspired by:
-- https://github.com/santalvarez/python-rule-engine
-- https://github.com/CacheControl/json-rules-engine
-
 ## Quick Start Example
+payload
 ```json
 {
     "data": {
@@ -68,12 +60,19 @@ This project is inspired by:
 ```elixir
 iex> JudgeJson.evaluate(payload)
 ```
-Return is an array of matched rules
+Returns a list of matched rules
 
-## Rule Schema
-The rule schema is very flexible and the only strict requirements are on the conditions. You can add your own rule id and action schema. If a rule is matched, the entire object is returned.
+## Documention and Usage
+Docs can be found at <https://hexdocs.pm/judge_json>
+
+Rule = Condition + Action
 
 Judge Json is storage and action agnostic. Ideally you can store/load rules from a DB and evaluate on incoming json payloads. Handler code can then evaluate rules and action however you like. 
+
+
+## Rule Schema
+The rule schema is very flexible and the only strict requirements are on the conditions. You can add your own rule id and action schema. If a rule is matched, the entire rule object is appended to the result list.
+
 
 Example:
 ```json
@@ -81,6 +80,15 @@ Example:
     "id": "",
     "conditions": {},
     "action": {}
+}
+```
+Example:
+```json
+{
+    "id": "d6f05047-807d-4970-b411-5575fb739dda",
+    "conditions": {},
+    "action": "on_match_script.exs",
+    "meta_data": {}
 }
 ```
 
@@ -161,4 +169,7 @@ Example:
 }
 ```
 
-
+## Credits
+This project is inspired by:
+- https://github.com/santalvarez/python-rule-engine
+- https://github.com/CacheControl/json-rules-engine

@@ -5,12 +5,19 @@ defmodule JudgeJson do
   require JSONPointer
 
   @doc """
-  evaluate rules
+  evaluate function consumes a map with schema:
+  ```json
+    {
+      "data": {},
+      "rules": []
+    }
+  ```
 
   """
   def evaluate(payload) do
     data = payload["data"]
     rules = payload["rules"]
+
     Task.async_stream(rules, fn rule ->
       if match_rule?(data, rule) do
         rule
@@ -31,10 +38,12 @@ defmodule JudgeJson do
         Enum.all?(all, fn condition ->
           match_conditions?(data, condition)
         end)
+
       %{"any" => any} ->
         Enum.any?(any, fn condition ->
           match_conditions?(data, condition)
         end)
+
       _ ->
         match_condition?(data, conditions)
     end
@@ -44,7 +53,9 @@ defmodule JudgeJson do
     case JSONPointer.get(data, condition["path"]) do
       {:ok, path} ->
         evaluate_path(path, condition["operator"], condition["value"])
-      {:error, _} -> false
+
+      {:error, _} ->
+        false
     end
   end
 
@@ -97,5 +108,4 @@ defmodule JudgeJson do
   defp evaluate_path(path, "less_than", value) when is_number(path), do: path < value
 
   defp evaluate_path(_path, _operator, _value), do: false
-
 end

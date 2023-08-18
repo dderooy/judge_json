@@ -1,17 +1,21 @@
 defmodule JudgeJson.MixProject do
   use Mix.Project
 
+  @version "0.1.0"
+  @source_url "https://github.com/dderooy/judge_json"
+
   def project do
     [
       app: :judge_json,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "judge_json",
       description: "An Elixir rule engine where rules are json objects. The judge gives verdicts on any rule matches for a provided json payload.",
-      source_url: "https://github.com/dderooy/judge_json",
-      package: package()
+      source_url: @source_url,
+      package: package(),
+      docs: docs()
     ]
   end
 
@@ -33,12 +37,22 @@ defmodule JudgeJson.MixProject do
     ]
   end
 
-  def package do
+  defp package do
     [
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/dderooy/judge_json",
+        "GitHub" => @source_url,
       }
+    ]
+  end
+
+  defp docs do
+    [
+      source_ref: "v#{@version}",
+      main: "readme",
+      extras: [
+        "README.md"
+      ]
     ]
   end
 end
