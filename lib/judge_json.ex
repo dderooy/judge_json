@@ -3,6 +3,7 @@ defmodule JudgeJson do
   Documentation for `JudgeJson`.
   """
   require JSONPointer
+  require Jason
 
   @doc """
   evaluate/1 function consumes a map with schema:
@@ -47,12 +48,12 @@ defmodule JudgeJson do
 
   defp match_conditions?(data, conditions) do
     case conditions do
-      %{"all" => all} ->
+      %{"all" => all} when is_list(all) ->
         Enum.all?(all, fn condition ->
           match_conditions?(data, condition)
         end)
 
-      %{"any" => any} ->
+      %{"any" => any} when is_list(any) ->
         Enum.any?(any, fn condition ->
           match_conditions?(data, condition)
         end)
@@ -65,60 +66,60 @@ defmodule JudgeJson do
   defp match_condition?(data, %{"path" => pointer, "operator" => operator, "value" => value}) do
     case JSONPointer.get(data, pointer) do
       {:ok, path} ->
-        evaluate_path(path, operator, value)
+        try do
+          evaluate_path(path, operator, value)
+        catch
+          _ -> false
+        end
 
       {:error, _} ->
         false
     end
   end
 
-  defp evaluate_path(path, "contains", value) when is_binary(path) do
-    String.contains?(path, value)
-  end
+  @doc false
+  defp match_condition?(_, _), do: false
 
-  defp evaluate_path(path, "not_contains", value) when is_binary(path) do
-    not String.contains?(path, value)
-  end
-
-  defp evaluate_path(path, "contains", value) when is_list(path) do
-    value in path
-  end
-
-  defp evaluate_path(path, "not_contains", value) when is_list(path) do
-    value not in path
-  end
-
-  defp evaluate_path(path, "contains", value) when is_map(path) do
-    Map.has_key?(path, value)
-  end
-
-  defp evaluate_path(path, "not_contains", value) when is_map(path) do
-    not Map.has_key?(path, value)
-  end
-
-  defp evaluate_path(_path, "contains", _value), do: false
-
-  defp evaluate_path(_path, "not_contains", _value), do: false
-
-  defp evaluate_path(path, "like", value) when is_binary(path) do
-    String.contains?(String.downcase(path), String.downcase(value))
-  end
-
-  defp evaluate_path(_path, "like", _value), do: false
-
-  defp evaluate_path(path, "regex_match", value) when is_binary(path) do
-    Regex.match?(value, path)
-  end
-
-  defp evaluate_path(_path, "regex_match", _value), do: false
-
-  defp evaluate_path(path, "equal", value), do: path == value
+  defp evaluate_path(path, "equals", value), do: path == value
 
   defp evaluate_path(path, "not_equal", value), do: path != value
 
   defp evaluate_path(path, "greater_than", value) when is_number(path), do: path > value
 
   defp evaluate_path(path, "less_than", value) when is_number(path), do: path < value
+
+  defp evaluate_path(path, "contains", value) when is_binary(path),
+    do: String.contains?(path, value)
+
+  defp evaluate_path(path, "contains", value) when is_list(path), do: value in path
+
+  defp evaluate_path(path, "contains", value) when is_map(path), do: Map.has_key?(path, value)
+
+  defp evaluate_path(_path, "contains", _value), do: false
+
+  defp evaluate_path(path, "not_contains", value) when is_binary(path),
+    do: not String.contains?(path, value)
+
+  defp evaluate_path(path, "not_contains", value) when is_list(path), do: value not in path
+
+  defp evaluate_path(path, "not_contains", value) when is_map(path),
+    do: not Map.has_key?(path, value)
+
+  defp evaluate_path(_path, "not_contains", _value), do: false
+
+  defp evaluate_path(path, "like", value) when is_binary(path) and is_binary(value),
+    do: String.contains?(String.downcase(path), String.downcase(value))
+
+  defp evaluate_path(path, "like", value) do
+    {:ok, like_path} = Jason.encode(path)
+    {:ok, like_value} = Jason.encode(value)
+    String.contains?(String.downcase(like_path), String.downcase(like_value))
+  end
+
+  defp evaluate_path(path, "regex_match", value) when is_binary(path),
+    do: Regex.match?(Regex.compile!(value), path)
+
+  defp evaluate_path(_path, "regex_match", _value), do: false
 
   defp evaluate_path(_path, _operator, _value), do: false
 end
