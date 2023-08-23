@@ -1,6 +1,24 @@
 # JudgeJson
 An Elixir rule engine where rules are json objects. The judge gives verdicts on data and returns any matched rules.
 
+## What and why are rule engines useful?
+A rules engine is a flexible piece of software that manages business rules.
+
+Rule = Condition + Action
+
+Think of business rules as dynamically loaded “if-then” statements. A rules engine fits really well with event hooks, event handling, and ETL flows. Generic webhook endpoint → rule match some condition → route / handle payload.
+
+A general design pattern:
+- collect / observe incoming data
+- evaluate against rules for any matches
+- trigger reactionary actions
+
+**The main benefits:**
+
+If you store rules in a DB, you can change your business logic on the fly during runtime. Essentially hot swap your business logic without reloading an app or changing code. It also makes changes much more maintainable with faster turn around time.
+
+Another understated benefit; you can isolate team and company concerns. One team / group can manage business rule CRUD lifecycle while another specialized dev team manages execution logic (action flows and handlers etc). None-coders can create new rules through a form gui and quickly change automations.
+
 
 ## Installation
 
@@ -23,7 +41,7 @@ payload
         "person": {
             "name": "Lionel",
             "last_name": "Messi",
-            "likes": [
+            "interests": [
                 "soccer",
                 "hot dogs",
                 "sports"
@@ -37,16 +55,16 @@ payload
                 "all": [
                     {
                         "path": "/person/name",
-                        "operator": "equal",
+                        "operator": "equals",
                         "value": "Lionel"
                     },
                     {
                         "path": "/person/last_name",
-                        "operator": "equal",
-                        "value": "Messi"
+                        "operator": "like",
+                        "value": "mess"
                     },
                     {
-                        "path": "/person/likes",
+                        "path": "/person/interests",
                         "operator": "contains",
                         "value": "soccer"
                     }
@@ -64,8 +82,6 @@ Returns a list of matched rules
 
 ## Documention and Usage
 Docs can be found at <https://hexdocs.pm/judge_json>
-
-Rule = Condition + Action
 
 Judge Json is storage and action agnostic. Ideally you can store/load rules from a DB and evaluate on incoming json payloads. Handler code can then evaluate rules and action however you like. 
 
@@ -107,7 +123,7 @@ Example:
 A [rfc json-pointer](https://www.rfc-editor.org/rfc/rfc6901) for the supplied json payload. 
 
 ### Operators
-- equal
+- equals
 - not_equal
 - greater_than
 - less_than
@@ -148,7 +164,7 @@ Example:
     "all": [
         {
             "path": "/name",
-            "operator": "equal",
+            "operator": "equals",
             "value": "A"
         },
         {
