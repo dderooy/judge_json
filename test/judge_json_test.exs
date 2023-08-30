@@ -256,6 +256,91 @@ defmodule JudgeJsonTest do
     assert length(results) == 1
   end
 
+  test "eval json strings" do
+    data = to_string('{"operator_test": "one"}')
+    rules = to_string('[
+      {
+        "id": "test_rule",
+        "conditions": {
+          "all": [
+            {
+              "path": "/operator_test",
+              "operator": "contains",
+              "value": "one"
+            }
+          ]
+        }
+      }
+    ]')
+    results = JudgeJson.evaluate(data, rules)
+    assert results != []
+    assert length(results) == 1
+
+    payload = to_string('
+      {
+          "data": {
+              "person": {
+                  "name": "Lionel",
+                  "last_name": "Messi",
+                  "interests": [
+                      "soccer",
+                      "hot dogs",
+                      "sports"
+                  ]
+              }
+          },
+          "rules": [
+              {
+                  "id": "123456",
+                  "conditions": {
+                      "all": [
+                          {
+                              "path": "/person/name",
+                              "operator": "equals",
+                              "value": "Lionel"
+                          },
+                          {
+                              "path": "/person/last_name",
+                              "operator": "like",
+                              "value": "mess"
+                          },
+                          {
+                              "path": "/person/interests",
+                              "operator": "contains",
+                              "value": "soccer"
+                          }
+                      ]
+                  },
+                  "action": "collect_signature.exs"
+              }
+          ]
+      }')
+    results = JudgeJson.evaluate(payload)
+    assert results != []
+    assert length(results) == 1
+
+    payload = "{
+      \"data\": {\"operator_test\": \"one\"},
+      \"rules\": [
+        {
+          \"id\": \"test_rule\",
+          \"conditions\": {
+            \"all\": [
+              {
+                \"path\": \"/operator_test\",
+                \"operator\": \"contains\",
+                \"value\": \"one\"
+              }
+            ]
+          }
+        }
+      ]
+    }"
+    results = JudgeJson.evaluate(payload)
+    assert results != []
+    assert length(results) == 1
+  end
+
   test "schema validation 1" do
     payload = %{
       "data" => %{

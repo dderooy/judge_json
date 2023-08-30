@@ -16,13 +16,12 @@ defmodule JudgeJson do
 
   """
   def evaluate(%{"data" => data, "rules" => rules}) when is_list(rules) do
-    Task.async_stream(rules, fn rule ->
-      if match_rule?(data, rule) do
-        rule
-      end
-    end)
-    |> Enum.map(fn {:ok, result} -> result end)
-    |> Enum.filter(& &1)
+    stream_rules(data, rules)
+  end
+
+  def evaluate(json_string) when is_binary(json_string) do
+    {:ok, %{"data" => data, "rules" => rules}} = Jason.decode(json_string)
+    stream_rules(data, rules)
   end
 
   @doc """
@@ -30,6 +29,16 @@ defmodule JudgeJson do
 
   """
   def evaluate(data, rules) when is_list(rules) do
+    stream_rules(data, rules)
+  end
+
+  def evaluate(data, rules) when is_binary(data) and is_binary(rules) do
+    {:ok, data} = Jason.decode(data)
+    {:ok, rules} = Jason.decode(rules)
+    stream_rules(data, rules)
+  end
+
+  def stream_rules(data, rules) when is_list(rules) do
     Task.async_stream(rules, fn rule ->
       if match_rule?(data, rule) do
         rule

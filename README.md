@@ -28,14 +28,14 @@ by adding `judge_json` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:judge_json, ">= 0.1.0"}
+    {:judge_json, ">= 1.0.0"}
   ]
 end
 ```
 
 ## Quick Start Example
-payload
-```json
+```elixir
+iex> payload = to_string('
 {
     "data": {
         "person": {
@@ -73,12 +73,36 @@ payload
             "action": "collect_signature.exs"
         }
     ]
-}
+}')
+iex>
+iex> results = JudgeJson.evaluate(payload)
+iex>
+iex> [
+  %{
+    "action" => "collect_signature.exs",
+    "conditions" => %{
+      "all" => [
+        %{"operator" => "equals", "path" => "/person/name", "value" => "Lionel"},
+        %{
+          "operator" => "like",
+          "path" => "/person/last_name",
+          "value" => "mess"
+        },
+        %{
+          "operator" => "contains",
+          "path" => "/person/interests",
+          "value" => "soccer"
+        }
+      ]
+    },
+    "id" => "123456"
+  }
+]
 ```
-```elixir
-iex> JudgeJson.evaluate(payload)
-```
-Returns a list of matched rules
+Notes:
+- Returns a list of matched rules with the complete rule json
+- JudgeJson.evaluate/1 and JudgeJson.evaluate/2 take elixir native data format or json binary strings
+- charlist is used for readability here and converted to binary string via to_string()
 
 ## Documention and Usage
 Docs can be found at <https://hexdocs.pm/judge_json>
