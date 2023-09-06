@@ -1,0 +1,119 @@
+# Judge Json
+
+```elixir
+Mix.install([
+  {:judge_json, ">= 1.0.0"}
+])
+```
+
+## Quick Start Example
+
+You can pass a big json paylaod:
+
+```elixir
+payload = to_string(~c"
+{
+    \"data\": {
+        \"person\": {
+            \"name\": \"Lionel\",
+            \"last_name\": \"Messi\",
+            \"interests\": [
+                \"soccer\",
+                \"hot dogs\",
+                \"sports\"
+            ]
+        }
+    },
+    \"rules\": [
+        {
+            \"id\": \"123456\",
+            \"conditions\": {
+                \"all\": [
+                    {
+                        \"path\": \"/person/name\",
+                        \"operator\": \"equals\",
+                        \"value\": \"Lionel\"
+                    },
+                    {
+                        \"path\": \"/person/last_name\",
+                        \"operator\": \"like\",
+                        \"value\": \"mess\"
+                    },
+                    {
+                        \"path\": \"/person/interests\",
+                        \"operator\": \"contains\",
+                        \"value\": \"soccer\"
+                    }
+                ]
+            },
+            \"action\": \"collect_signature.exs\"
+        }
+    ]
+}")
+IO.puts("Your matched rules are:")
+results = JudgeJson.evaluate(payload)
+```
+
+You can also split the data and rules up like:
+
+```elixir
+data = to_string(~c"{
+    \"source\": \"Microsoft\",
+    \"product\": \"ms_product\",
+    \"data\": {
+        \"msg\": \"xyz happened\"
+    }
+}")
+rules = to_string(~c"[
+    {
+        \"id\": \"MS_RULE_123\",
+        \"conditions\": {
+            \"all\": [
+                {
+                    \"path\": \"/source\",
+                    \"operator\": \"equals\",
+                    \"value\": \"Microsoft\"
+                },
+                {
+                    \"path\": \"/data/msg\",
+                    \"operator\": \"like\",
+                    \"value\": \"XYZ\"
+                }
+            ]
+        },
+        \"action\": \"handle_XYZ\"
+    }
+]")
+IO.puts("Your matched rules are:")
+results = JudgeJson.evaluate(data, rules)
+```
+
+You can also pass plain Elixir like:
+
+```elixir
+data = %{"message" => ["one", "two", "three"]}
+
+rules = [
+  %{
+    "id" => "test_rule",
+    "conditions" => %{
+      "any" => [
+        %{
+          "path" => "/message",
+          "operator" => "contains",
+          "value" => "four"
+        },
+        %{
+          "path" => "/message",
+          "operator" => "contains",
+          "value" => "two"
+        }
+      ]
+    },
+    "action" => "run some handler code"
+  }
+]
+
+IO.puts("Your matched rules are:")
+results = JudgeJson.evaluate(data, rules)
+```
