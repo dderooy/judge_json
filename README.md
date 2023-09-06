@@ -34,6 +34,9 @@ end
 ```
 
 ## Quick Start Example
+[![Run in Livebook](https://livebook.dev/badge/v1/blue.svg)](https://livebook.dev/run?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdderooy%2Fjudge_json%2Fmain%2Fnotebook%2Fquick_start.livemd)
+
+
 ```elixir
 iex> payload = to_string('
 {
